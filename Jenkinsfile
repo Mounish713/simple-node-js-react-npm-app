@@ -21,11 +21,14 @@ pipeline {
             }
         }
 
-        stage('Build') {
+         stage('build') {
             steps {
-                sh 'npm install'
+              container('nodejs') {
+                sh 'npm run build'
+              }
             }
         }
+
         stage('Test') {
                     steps {
                         sh './jenkins/scripts/test.sh'
