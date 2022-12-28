@@ -39,4 +39,5 @@ pipeline {
         dockerImage.push()
 	   }
     }
+}
     
