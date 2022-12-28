@@ -17,27 +17,26 @@ pipeline {
     
     
     stages {
-        stage('Build') {
-            steps {
-                sh 'npm install'
-            }
-        }
-        stage('Test') {
-                    steps {
-                        sh './jenkins/scripts/test.sh'
-                    }
-                }
-       
-  stage("Remove the local Docker image") {
-      steps {
-        container('nodejs') {
-          sh '''
-            docker image rm $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER
-          '''
-        }
-      }
+        stage('checkout and build') {
+        
+            git 'https://github.com/Mounish713/simple-node-js-react-npm-app.git'
+            sh 'npm install'
+        
+        
     }
-  }  
-}
-               
+    stage('Clone repository') {
+        git credentialsId: 'git', url: 'https://github.com/Mounish713/simple-node-js-react-npm-app.git'
+    }
+    
+    stage('Build image') {
+        dockerImage = docker.build("mounishreddy/my-react-app:latest")
+       //dockerImage = "docker build -t mounishreddy/reactjs:latest"
+    }
+    
+    stage('Push image') {
+	   //dockerImage = "docker push mounishreddy/reactjs:latest"
+	    withDockerRegistry([ credentialsId: "harbor-id", url : "" ]) {
+        dockerImage.push()
+	   }
+    }
     
