@@ -1,13 +1,21 @@
 pipeline {
     agent {
-        docker {
-            image 'node:6-alpine'
-            args '-p 3000:3000'
-        }
+     node {
+      label 'nodejs'
+     }
     }
-     environment {
-            CI = 'true'
-        }
+    environment {
+     DOCKER_CREDENTIAL_ID = 'harbor-id'
+     REGISTRY = '172.30.102.24:30002'
+     DOCKERHUB_NAMESPACE = 'library'
+     APP_NAME = 'nextg-ui'
+     NODEJS_HOME = "${tool 'nodejs-16.13.1'}"
+     PATH="${env.NODEJS_HOME}/bin:${env.PATH}"
+    }
+
+     
+    
+    
     stages {
         stage('Build') {
             steps {
@@ -19,13 +27,27 @@ pipeline {
                         sh './jenkins/scripts/test.sh'
                     }
                 }
-                stage('Deliver') {
-                            steps {
-                                sh './jenkins/scripts/deliver.sh'
-                                input message: 'Finished using the web site? (Click "Proceed" to continue)'
-                                sh './jenkins/scripts/kill.sh'
-                            }
-                        }
-
+        stage('build and push docker image') {
+          steps {
+            container('nodejs') {
+              sh 'docker build -t $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER .'
+              withCredentials([usernamePassword(passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME', credentialsId: "$DOCKER_CREDENTIAL_ID",)]) {
+                            sh 'echo "$DOCKER_PASSWORD" | docker login $REGISTRY -u "$DOCKER_USERNAME" --password-stdin'
+                            sh 'docker push $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER'
+        }
+      }
     }
+  }
+  stage("Remove the local Docker image") {
+      steps {
+        container('nodejs') {
+          sh '''
+            docker image rm $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER
+          '''
+        }
+      }
+    }
+  }  
 }
+               
+    
