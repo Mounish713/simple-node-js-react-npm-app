@@ -12,35 +12,41 @@ pipeline {
      NODEJS_HOME = "${tool 'nodejs-16.13.1'}"
      PATH="${env.NODEJS_HOME}/bin:${env.PATH}"
     }
+    stages {
+	stage('Install') {
+            steps {
+              container('nodejs') {
+                sh 'npm install'
+              }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'npm install'
+            }
+        }
+        stage('Test') {
+                    steps {
+                        sh './jenkins/scripts/test.sh'
+                    }
+                }
+	stage('build and push docker image') {
+          steps {
+            container('nodejs') {
+                  sh 'docker build -t $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER .'
+                  withCredentials([usernamePassword(passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME', credentialsId: "$DOCKER_CREDENTIAL_ID",)]) {
+                                sh 'echo "$DOCKER_PASSWORD" | docker login $REGISTRY -u "$DOCKER_USERNAME" --password-stdin'
+                                sh 'docker push $REGISTRY/$DOCKERHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER'
+        }
+      }
+    }
+  }
 
      
-    
-    
-    stages {
-        stage('checkout and build') {
-        
-            git 'https://github.com/Mounish713/simple-node-js-react-npm-app.git'
-            sh 'npm install'
-        
-        
-    }
-    stage('Clone repository') {
-        git credentialsId: 'git', url: 'https://github.com/Mounish713/simple-node-js-react-npm-app.git'
     }
     
-    stage('Build image') {
-        dockerImage = docker.build("mounishreddy/my-react-app:latest")
-       //dockerImage = "docker build -t mounishreddy/reactjs:latest"
-    }
     
-    stage('Push image') {
-	   //dockerImage = "docker push mounishreddy/reactjs:latest"
-	    withDockerRegistry([ credentialsId: "harbor-id", url : "" ]) {
-        dockerImage.push()
-	   }
-    }
-
-  }  
 }
 	    
     
