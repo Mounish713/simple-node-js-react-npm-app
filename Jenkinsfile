@@ -37,10 +37,10 @@ pipeline {
 	stage('build and push docker image') {
           steps {
             container('nodejs') {
-                  sh 'docker build -t $REGISTRY/$HARBOR_NAMESPACE/$APP_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER .'
+                  sh 'docker build -t $REGISTRY/$HARBOR_NAMESPACE/$APP_NAME:1.0.0-SNAPSHOT .'
                   withCredentials([usernamePassword(passwordVariable: 'HARBOR_PASSWORD', usernameVariable: 'HARBOR_USERNAME', credentialsId: "$HARBOR_CREDENTIAL_ID",)]) {
                                 sh 'echo "$HARBOR_PASSWORD" | docker login $REGISTRY -u "$HARBOR_USERNAME" --password-stdin'
-                                sh 'docker push $REGISTRY/$HARBORHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER'
+                                sh 'docker push $REGISTRY/$HARBORHUB_NAMESPACE/$APP_NAME:1.0.0-SNAPSHOT'
         }
       }
     }
@@ -49,7 +49,7 @@ pipeline {
       steps {
         container('nodejs') {
           sh '''
-            docker image rm $REGISTRY/$HARBORHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER
+            docker image rm $REGISTRY/$HARBORHUB_NAMESPACE/$APP_NAME:1.0.0-SNAPSHOT
           '''
         }
       }
