@@ -40,7 +40,7 @@ pipeline {
                   sh 'docker build -t $REGISTRY/$HARBOR_NAMESPACE/$APP_NAME:1.0.0-SNAPSHOT .'
                   withCredentials([usernamePassword(passwordVariable: 'HARBOR_PASSWORD', usernameVariable: 'HARBOR_USERNAME', credentialsId: "$HARBOR_CREDENTIAL_ID",)]) {
                                 sh 'echo "$HARBOR_PASSWORD" | docker login $REGISTRY -u "$HARBOR_USERNAME" --password-stdin'
-                                sh 'docker push $REGISTRY/$HARBORHUB_NAMESPACE/$APP_NAME:1.0.0-SNAPSHOT'
+                                sh 'docker push $REGISTRY/$HARBOR_NAMESPACE/$APP_NAME:1.0.0-SNAPSHOT'
         }
       }
     }
