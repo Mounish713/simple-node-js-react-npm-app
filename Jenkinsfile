@@ -49,7 +49,7 @@ pipeline {
       steps {
         container('nodejs') {
           sh '''
-            docker image rm $REGISTRY/$HARBORHUB_NAMESPACE/$APP_NAME:1.0.0-SNAPSHOT
+            docker image rm $REGISTRY/$HARBOR_NAMESPACE/$APP_NAME:1.0.0-SNAPSHOT
           '''
         }
       }
