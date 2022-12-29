@@ -5,7 +5,7 @@ pipeline {
      }
     }
     environment {
-     DOCKER_CREDENTIAL_ID = 'harbor-id'
+     HARBOR_CREDENTIAL_ID = 'harbor-id'
      REGISTRY = '172.30.102.24:30002'
      HARBOR_NAMESPACE = 'library'
      APP_NAME = 'demo-react-app'
