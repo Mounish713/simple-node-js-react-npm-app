@@ -8,7 +8,7 @@ pipeline {
      DOCKER_CREDENTIAL_ID = 'harbor-id'
      REGISTRY = '172.30.102.24:30002'
      HARBOR_NAMESPACE = 'library'
-     APP_NAME = 'Demo-React-App'
+     APP_NAME = 'demo-react-app'
      NODEJS_HOME = "${tool 'nodejs-16.13.1'}"
      PATH="${env.NODEJS_HOME}/bin:${env.PATH}"
     }
