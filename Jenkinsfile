@@ -45,6 +45,16 @@ pipeline {
       }
     }
   }
+	    stage("Remove the local Docker image") {
+      steps {
+        container('nodejs') {
+          sh '''
+            docker image rm $REGISTRY/$HARBORHUB_NAMESPACE/$APP_NAME:SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER
+          '''
+        }
+      }
+    }
+
 
      
     }
